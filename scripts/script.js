@@ -71,12 +71,16 @@ function rightRoute(directionsService, directionsDisplay) {
 					console.log(leg)
 						var steps = leg["steps"];
 						for(var y = 0; y < steps.length; y++){
+							if(steps[y]['maneuver'] === "turn-left") {
+								console.log("OH SHIT ITS A LEFT YO")
+							}
+
 							// grabbing the steps one by one 
 							// they can be differentiated by their maneuver
 							// console.log(steps[y]["maneuver"]);
 							// console.log(steps[y]);
 
-							
+
 
 
 						}
