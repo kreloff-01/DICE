@@ -6,6 +6,52 @@ function calculatePotHoles() {
 
 }
 
+// to load JSON pothole & street data
+
+function loadJSON(callback) {
+
+	var xobj = new XMLHttpRequest();
+	xobj.overrideMimeType("application/json");
+	xobj.open('GET', 'data/street_ph.json', true); // Replace 'my_data' with the path to your file
+	xobj.onreadystatechange = function () {
+		if (xobj.readyState == 4 && xobj.status == "200") {
+			// Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+			callback(xobj.responseText);
+		}
+	}
+	xobj.send(null);
+}
+
+
+function count(obj) {
+	var count=0;
+	for(var prop in obj) {
+		if (obj.hasOwnProperty(prop)) {
+			++count;
+		}
+	}
+	return count;
+}
+
+
+// get the number of potholes from the JSON
+function getNumPotholes() {
+	loadJSON(function(response) {
+		// Parse JSON string into object
+		actual_JSON = JSON.parse(response);
+		console.log(actual_JSON);
+		var num = count(actual_JSON);
+		console.log(num);
+
+	});
+
+	//for(int i = 0; i < Object.keys(actual_JSON).length; i++){
+	//console.log(Object.keys(actual_JSON).length);
+	//}
+}
+
+getNumPotholes();
+
 function simscore (s1, s2) {
 	q1 = qgram(s1);
 	q2 = qgram(s2);
