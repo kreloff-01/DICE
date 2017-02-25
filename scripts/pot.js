@@ -1,13 +1,22 @@
-//var index = require('../data/street_ph.json')
+// given a street name, and two (lat, lon) points representing turn points,
+// calculate the number of potholes in that segment of the street.
+function calculatePotHoles(street_name) {
+	loadJSON(function(response) {
+		actual_JSON = JSON.parse(response);
+		if (actual_JSON[street_name] === null) {
+			var streets = Object.keys(actual_JSON);
+			for (var i = 0; i < streets.length; i++ ) {
+				console.log(streets[i]);
+				if (simscore(street_name, streets[i]) > .8){
 
-
-function calculatePotHoles() {
-	
-
+				}
+			}
+		}
+		var street = actual_JSON[street_name];
+	});
 }
 
 // to load JSON pothole & street data
-
 function loadJSON(callback) {
 
 	var xobj = new XMLHttpRequest();
@@ -42,15 +51,10 @@ function getNumPotholes() {
 		console.log(actual_JSON);
 		var num = count(actual_JSON);
 		console.log(num);
-
 	});
-
-	//for(int i = 0; i < Object.keys(actual_JSON).length; i++){
-	//console.log(Object.keys(actual_JSON).length);
-	//}
 }
 
-getNumPotholes();
+calculatePotHoles("E 102ND ST");
 
 function simscore (s1, s2) {
 	q1 = qgram(s1);
