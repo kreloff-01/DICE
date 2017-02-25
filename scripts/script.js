@@ -1,7 +1,9 @@
+var map;
+
 function initMap() {
 	var directionsService = new google.maps.DirectionsService;
 	var directionsDisplay = new google.maps.DirectionsRenderer;
-	var map = new google.maps.Map(document.getElementById('map'), {
+	map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 6,
 		center: {lat: 41.85, lng: -87.65}
 	});
@@ -69,11 +71,65 @@ function rightRoute(directionsService, directionsDisplay) {
 				for(var j = 0; j < legs.length; j++) {
 					var leg = legs[j];
 					console.log(leg)
-						var steps = leg["steps"];
-						for(var y = 0; y < steps.length; y++){
-							if(steps[y]['maneuver'] === "turn-left") {
-								console.log("OH SHIT ITS A LEFT YO")
-							}
+					var steps = leg["steps"];
+					var prevLat, prevLng;
+					var prevDirection;
+					var lat, lon;
+					var skip = false;
+
+					for(var y = 0; y < steps.length; y++){
+
+
+						lat = steps[y]['start_point'].lat()
+						lon = steps[y]['start_point'].lng()
+
+						console.log(lat +", " + lon)
+
+						if(steps[y]['maneuver'] === "turn-left") {
+
+							// console.log("OH SHIT ITS A LEFT YO")
+							// console.log(steps[y])
+							// console.log("LAT : " + lat)
+							// console.log("LONG : " + lon)
+							// the below coordinates correspond to the intersection you are taking the left on
+							// console.log(lat + ", " + lon)
+							
+							
+
+							var pos = new google.maps.LatLng(lat, lon);
+
+
+							var request = {
+								location: pos,
+								radius: 100
+							};
+
+
+
+
+
+						}
+
+						prevDirection = getCardinalDirection(prevLat, prevLng, lat, lon);
+
+						console.log("DIRECTION")
+						console.log(prevDirection)
+
+						prevLat = lat;
+						prevLng = lon;
+
+
+						if(y === 0) {
+							var startLat = steps[y]['start_point'].lat();
+							var startLng = steps[y]['start_point'].lng();
+							prevLat = steps[y]['end_point'].lat();
+							prevLng = steps[y]['end_point'].lng();
+							prevDirection = getCardinalDirection(startLat, startLng, prevLat, prevLng);
+						}
+
+
+					// prevLat = steps[y]['start_point'].lat();
+					// prevLng = steps[y]['start_point'].lng();
 
 							// grabbing the steps one by one 
 							// they can be differentiated by their maneuver
@@ -84,9 +140,9 @@ function rightRoute(directionsService, directionsDisplay) {
 
 
 						}
+					}
 				}
 			}
-		}
 
 		// console.log(response);
 		// if (status === 'OK') {
@@ -107,4 +163,66 @@ function rightRoute(directionsService, directionsDisplay) {
   //       	window.alert('Directions request failed due to ' + status);
   //       }
 });
+}
+
+
+function getNearBy(request, latitude, longitude, prevLatt, prevLong) {
+	var service = new google.maps.places.PlacesService(map);
+	service.nearbySearch(request, function(results, status){ 
+		var templat = latitude;
+		var templon = longitude;
+		var prevLatTemp = prevLatt;
+		var prevLngTemp = prevLong;
+		callback(results, status, templat, templon, prevLatTemp, prevLngTemp) 
+	}); 
+
+	// function calcWaypoint(param1, param2, param3, param4) {
+	// 	var templon = param2;
+							// 	var templat = param1;
+							// 	var tempPrevLon = param4;
+							// 	var tempPrevLat = param3;
+							// }
+
+
+							function callback(results, status, latt, lng, prevLatt, prevLong) {
+								if (status == google.maps.places.PlacesServiceStatus.OK) {
+									for (var l = 0; l < results.length; l++) {
+
+										// console.log(results[i])
+										console.log("... Calculating the direction to location ...")
+										prevDirection = getCardinalDirection(latt, lng, prevLatt, prevLong);
+
+										console.log("DIRECTION for left turn")
+										console.log(prevDirection)
+									// // createMarker(results[i]);
+								}
+							}
+						}
+					}
+
+
+
+					function getCardinalDirection(lat1, lng1, lat2, lng2) {
+
+						var lon_distance = (lng2-lng1);
+
+						console.log("lat1 : " + lat1 + "\nlng1 : " + lng1 + "\nlat2 : " + lat2 + "\nlng2 : " + lng2)
+
+						var y = Math.sin(lon_distance) * Math.cos(lat2);
+						var x = Math.cos(lat1)*Math.sin(lat2) -
+						Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon_distance);
+	var bearng_calc = Math.atan2(y, x) * (180/Math.PI);  // bearing
+
+	// console.log("BEARING CALCULATION : " + bearng_calc)
+
+	var bearings = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"];    // cardinal directions yo
+
+	var index = bearng_calc - 22.5;
+
+
+	if (index < 0)
+		index += 360;
+	index = parseInt(index / 45);
+
+	return(bearings[index]);
 }
