@@ -14,6 +14,8 @@ function initMap() {
     });
 }
 
+var routeResponse;
+
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     var waypts = [];
     var checkboxArray = document.getElementById('waypoints');
@@ -36,6 +38,8 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         if (status === 'OK') {
             directionsDisplay.setDirections(response);
             var route = response.routes[0];
+            console.log(response);
+            calculateBestPath(response);
             var summaryPanel = document.getElementById('directions-panel');
             summaryPanel.innerHTML = '';
             // For each route, display summary information.
@@ -52,6 +56,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         }
     });
 }
+
 
 function rightRoute(directionsService, directionsDisplay) {
 	var waypts = [];
@@ -93,9 +98,7 @@ function rightRoute(directionsService, directionsDisplay) {
 							// console.log("LONG : " + lon)
 							// the below coordinates correspond to the intersection you are taking the left on
 							// console.log(lat + ", " + lon)
-							
-							
-
+                            
 							var pos = new google.maps.LatLng(lat, lon);
 
 
@@ -225,4 +228,4 @@ function getNearBy(request, latitude, longitude, prevLatt, prevLong) {
 	index = parseInt(index / 45);
 
 	return(bearings[index]);
-} 
+}
