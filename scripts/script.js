@@ -4,6 +4,7 @@ var start;
 var end;
 
 function initMap() {
+<<<<<<< HEAD
     var directionsService = new google.maps.DirectionsService;
     var directionsDisplay = new google.maps.DirectionsRenderer;
     var map = new google.maps.Map(document.getElementById('map'), {
@@ -30,6 +31,20 @@ function initMap() {
         calculateAndDisplayRoute(directionsService, directionsDisplay);
         // call this in above mod functions?
     });
+=======
+	var directionsService = new google.maps.DirectionsService;
+	var directionsDisplay = new google.maps.DirectionsRenderer;
+	map = new google.maps.Map(document.getElementById('map'), {
+		zoom: 6,
+		center: {lat: 41.85, lng: -87.65}
+	});
+	directionsDisplay.setMap(map);
+
+	document.getElementById('submit').addEventListener('click', function() {
+		//rightRoute(directionsService, directionsDisplay);
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
+	});
+>>>>>>> 7527c949f160b531532bd047946a30c18286ab80
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -54,10 +69,13 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         travelMode: google.maps.TravelMode[travelMode]
     }, function(response, status) {
         if (status === 'OK') {
+            console.log("OK ENTERED");
             directionsDisplay.setDirections(response);
             var route = response.routes[0];
+            var weights = [];
             console.log(response);
-            calculateBestPath(response);
+            weights = calculateBestPath(response);
+            console.log(weights + " weights final");
             var summaryPanel = document.getElementById('directions-panel');
             summaryPanel.innerHTML = '';
             // For each route, display summary information.
