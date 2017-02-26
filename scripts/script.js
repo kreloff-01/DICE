@@ -1,6 +1,8 @@
 var map;
 var bearings = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"];    // cardinal directions yo
 
+var masterWaypoints = [];
+
 
 function initMap() {
 	var directionsService = new google.maps.DirectionsService;
@@ -56,20 +58,20 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 }
 
 function rightRoute(directionsService, directionsDisplay) {
-	console.log("motherfucker")
+	// console.log("motherfucker")
 	var waypts = [];
 	directionsService.route({
-        origin: document.getElementById('start').value,
-        destination: document.getElementById('end').value,
-        waypoints: waypts,
-        optimizeWaypoints: true,
-        travelMode: 'DRIVING'
-    }, function(response, status) {
+		origin: document.getElementById('start').value,
+		destination: document.getElementById('end').value,
+		waypoints: waypts,
+		optimizeWaypoints: true,
+		travelMode: 'DRIVING'
+	}, function(response, status) {
 		// var takenRoute = [];
 		if(status === "OK") {
-			console.log(1 + "response")
+			// console.log(1 + "response")
 			var routes = response['routes'];
-			console.log(routes);
+			// console.log(routes);
 			for(var i = 0 ; i < routes.length; i++) {
 				var route = routes[i];
 				var legs = route['legs'];
@@ -84,7 +86,7 @@ function rightRoute(directionsService, directionsDisplay) {
 					var skip = false;
 
 					for(var y = 0; y < steps.length; y++){
-						console.log("AGGGGGGGGG")
+						// console.log("AGGGGGGGGG")
 						// console.log(steps[y])
 
 						lat = steps[y]['start_point'].lat()
@@ -116,6 +118,8 @@ function rightRoute(directionsService, directionsDisplay) {
 
 
 
+						} else {
+							masterWaypoints.push(new google.maps.LatLng(lat, lon));
 						}
 
 						prevDirection = getCardinalDirection(prevLat, prevLng, lat, lon);
@@ -135,12 +139,12 @@ function rightRoute(directionsService, directionsDisplay) {
 
 
 
-						}
 					}
 				}
 			}
+		}
 
-});
+	});
 }
 
 function getCardinalDirection(lat1, lng1, lat2, lng2) {
@@ -181,7 +185,7 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 
 
 
-							function callback(results, status, latt, lng, tempPrevDirection) {
+	function callback(results, status, latt, lng, tempPrevDirection) {
 								// console.log(3)
 								// console.log("kklat1 : " + latitude + "\nlng1 : " + longitude + "\nlat2 : " + prevLatt + "\nlng2 : " + prevLong)
 								var keep = [];
@@ -215,9 +219,9 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 										console.log(indexOfPrevDirect + " ::: " + indexOfTempDirect)
 
 										if(indexOfTempDirect - indexOfPrevDirect <= 3 && indexOfTempDirect - indexOfPrevDirect >= 0) {
-											console.log("should be a right turn");
-											console.log("DIRECTION for left turn\nPrevDirection --> directionOfHotspot")
-											console.log(tempPrevDirection + " --> " + tempDirection)
+											// console.log("should be a right turn");
+											// console.log("DIRECTION for left turn\nPrevDirection --> directionOfHotspot")
+											// console.log(tempPrevDirection + " --> " + tempDirection)
 											keep.push(results[l]);
 
 										}
@@ -225,7 +229,36 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 									// // createMarker(results[i]);
 								}
 							}
-							console.log(keep);
-							// should do some distance shit here probably.
-						}
-					}
+							var pos = new google.maps.LatLng(latt, lng);
+							var bestWaypoint = null;
+							var service = new google.maps.DistanceMatrixService();
+
+							for(var i =0; i < keep.length; i++) {
+								var tempdest = new google.maps.LatLng(keep[i]['geometry']['location'].lat(), keep[i]['geometry']['location'].lng());
+
+								service.getDistanceMatrix(
+								{
+									origins: [pos],
+									destinations: [tempdest],
+									travelMode: 'DRIVING',
+								}, function(response, status){
+									var tempDestination = tempdest;
+									callback(response, status, tempDestination);
+								});
+
+								function callback(response, status, destination) {
+									console.log(response['rows'][0]['elements'][0]['distance']);
+									if( response['rows'][0]['elements'][0]['distance']['value'] < bestWaypoint || bestWaypoint === null) {
+										bestWaypoint = response['rows'][0]['elements'][0]['distance']['value'];
+										// console.log(destination);
+										masterWaypoints.push(destination);
+										// console.log("^^^^^");
+									}
+
+								}
+
+
+}
+
+}
+}
