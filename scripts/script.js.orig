@@ -1,5 +1,7 @@
 var map;
-var bearings = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"];    // cardinal directions yo
+var route_status;
+var start;
+var end;
 
 function initMap() {
 <<<<<<< HEAD
@@ -263,4 +265,134 @@ function getCardinalDirection(lat1, lng1, lat2, lng2) {
     index = parseInt(index / 45);
 
 	return(bearings[index]);
+<<<<<<< HEAD
+} 
+
+
+
+// uses google places API in order to get nearby places of interest. 
+// we can use these to set another waypoint to force right turns over left
+function getNearBy(request, latitude, longitude, prevDirect) {
+	// instantiate service
+	var service = new google.maps.places.PlacesService(map);
+
+	// make the search. it is async which is why we have a compound callback function
+	// we need it to pass 
+	service.nearbySearch(request, function(results, status){
+		// save variables to the scope of the callback func
+		var templat = latitude;
+		var templon = longitude;
+		var tempPrevDirection = prevDirect;
+		// make the actual callback function
+		callback(results, status, templat, templon, tempPrevDirection);
+	}); 
+
+
+
+	function callback(results, status, latt, lng, tempPrevDirection) {
+								// array of possible waypoints to keep 
+								var keep = [];
+								if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+									// iterate through the results testing if they require a left turn 
+									for (var l = 0; l < results.length; l++) {
+
+										// console.log(results[l])
+										console.log("... Calculating the direction to location ...")
+										var tempLat = results[l]['geometry']['location'].lat();
+										var tempLng = results[l]['geometry']['location'].lng();
+
+										var tempDirection = getCardinalDirection(tempLat, tempLng, latt, lng);
+
+										
+
+
+
+										/* the following section determines if you are taking a left or right turn based on the change in cardinal directions */
+										var indexOfPrevDirect = bearings.indexOf(tempPrevDirection);
+										var indexOfTempDirect;
+										if(indexOfPrevDirect > 4) {
+											var temp = 4;
+											for(var q = 0; q < bearings.length; q++) {
+												if(bearings[q] === tempPrevDirection) {
+													break;
+												}
+												temp++;
+											}
+											indexOfTempDirect = temp;
+										} else {
+											indexOfTempDirect = bearings.indexOf(tempDirection);
+										}
+										/* end of section */ 
+
+
+										// console.log(indexOfPrevDirect + " ::: " + indexOfTempDirect)
+
+										// if it is not a left turn, add it to the list of possible waypoints
+										if(indexOfTempDirect - indexOfPrevDirect <= 3 && indexOfTempDirect - indexOfPrevDirect >= 0) {
+											// console.log("should be a right turn");
+											// console.log("DIRECTION for left turn\nPrevDirection --> directionOfHotspot")
+											// console.log(tempPrevDirection + " --> " + tempDirection)
+											keep.push(results[l]);
+
+										}
+
+									// // createMarker(results[i]);
+								}
+							}
+
+							// get a lat/lon position for current pos
+							var pos = new google.maps.LatLng(latt, lng);
+							var bestWaypoint = null;
+							// initialize service
+							var service = new google.maps.DistanceMatrixService();
+							// iterate through the keep and calculate distance
+
+
+							for(var i =0; i < keep.length; i++) {
+								// temp lat/lon variable for calculation
+								var tempdest = new google.maps.LatLng(keep[i]['geometry']['location'].lat(), keep[i]['geometry']['location'].lng());
+								// request the distance matrix from google. async
+								service.getDistanceMatrix(
+								{
+									origins: [pos],
+									destinations: [tempdest],
+									travelMode: 'DRIVING',
+								}, function(response, status){
+									var index = i;
+									// another compound callback function to pass the possible waypoint the scope of the 
+									// callback before overwritting
+									var tempDestination = tempdest;
+									// perform callback
+									callback(response, status, tempDestination, bestWaypoint, index);
+
+								});
+
+								// console.log("MAYBE ASYNC DONE?")
+
+
+								function callback(response, status, destination, bestWaypoint, index) {
+									// distance
+									console.log(response['rows'][0]['elements'][0]['distance']);
+									// if the distance is smallest, push to master waypoints.
+									// however there are issues here do to the async nature of the calls. 
+									if( response['rows'][0]['elements'][0]['distance']['value'] < bestWaypoint || bestWaypoint === null) {
+										bestWaypoint = response['rows'][0]['elements'][0]['distance']['value'];
+										masterWaypoints.push(destination);    /// this is most likely wrong. 
+									}
+									// console.log("Index " + index)
+									// if(index === keep.length) {
+									// 	console.log("Honky bitches be tripping")
+									// }
+
+								}
+
+
+							}
+							// console.log("IS IT DONE YET?")
+
+						}
+					}
+=======
 }
+>>>>>>> 0cf21edf3aaa8a369e6b2e84d994ba998c04f5f5

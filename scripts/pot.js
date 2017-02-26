@@ -1,24 +1,53 @@
 //var index = require('../data/street_ph.json')
+var json = (function () {
+	var json = null;
+	$.ajax({
+		'async': false,
+		'global': false,
+		'url': "/data/street_ph.json",
+		'dataType': "json",
+		'success': function (data) {
+			json = data;
+		}
+	});
+	return json;
+})();
+
+function sleep(milliseconds) {
+	var start = new Date().getTime();
+	for (var i = 0; i < 1e7; i++) {
+		if ((new Date().getTime() - start) > milliseconds){
+			break;
+		}
+	}
+}
 
 function calculateBestPath(responses){
 	var numRoutes = responses.routes.length;
+	//console.log(numRoutes + " num routes");
 	// contains the total street weights
-	var routeWeights = [numRoutes];
+	var routeWeights = [0,0,0];
 	// for each route, send all of the streets in route i through the weight algorithm
 	// the final sum total of streets weights are put into the array
-	for(var i = 0; i < numRoutes; i++){
+	for(var i = 0; i < 3; i++){
 		var weight = 0;
-		for(var j = 0; j < responses.routes[i].legs.length; j++){
+		for(var j = 0; j < responses.routes[i].legs.length; j++) {
 			var streets = [responses.routes[i].legs[j].steps.length];
-			for(var k = 0; k < responses.routes[i].legs[j].steps.length; k++) {
+			for (var k = 0; k < responses.routes[i].legs[j].steps.length; k++) {
 				var name = parseStreetName(responses.routes[i].legs[j].steps[k].instructions);
-				streets[i] = new pathObj(name, responses.routes[i].legs[j].steps[k].start_location.toString(),
+				streets[k] = new pathObj(name, responses.routes[i].legs[j].steps[k].start_location.toString(),
 					responses.routes[i].legs[j].steps[k].end_location.toString());
+				//console.log(calculatePotHoleWeight(streets[k]) + " weight");
+				var temp = calculatePotHoleWeight(streets[k]);
+				//console.log(routeWeights)
+				//console.log("TEMP : " + temp)
+				routeWeights[i] += temp;
+				//console.log(routeWeights[i] + " curr route weight");
 			}
-			routeWeights[i] = calculatePotHoleWeight(streets);
 		}
-
+		console.log(routeWeights[i] + " route weight");
 	}
+	return routeWeights;
 }
 
 // obj contains the streetname, start poing & end point for use in getting weight of pothoels
@@ -37,11 +66,7 @@ function parseStreetName(instructions){
 	return result[result.length-1];
 }
 
-function getPotholesFromStreetName(pathobj){
-	console.log(JSON);
-}
-
-// to load JSON pothole & street data
+/*// to load JSON pothole & street data
 function loadJSON(callback) {
 
 	var xobj = new XMLHttpRequest();
@@ -54,22 +79,78 @@ function loadJSON(callback) {
 		}
 	}
 	xobj.send(null);
-}
+} */
 
-
-function calculatePotHoleWeight(streets) {
-	loadJSON(function(response) {
+//possible optimization here
+function calculatePotHoleWeight(street) {
+	var weight = 0;
+	//loadJSON(function(response) {
 		// Parse JSON string into object
-		var actual_JSON = JSON.parse(response);
-		var countJSON = count(actual_JSON);
-	});
-	//for each street, calcuate the closest street name first
-	for(var i = 0; i < streets.length; i++){
-		var numPotholes
-	}
+		var actual_JSON = json;
+		//for each street name
+		var closest;
+		var max = 0;
+		//console.log(street.name.toUpperCase() + " <- street");
+		for(var key in actual_JSON){
+			// console.log(key + " <- key");
+			if(max < simscore(key.toString(), street.name.toUpperCase())){
+				// console.log(key + " new closest key");
+				max = simscore(key.toString(), street.name.toUpperCase());
+				closest = key;
+			}
+		}
 
-	
+		// calculate radius / distance formula
+
+		var startPts = street.startLatLong.toString().split(",");
+		var endPts = street.endLatLong.toString().split(",");
+
+		var startLatitude = parseFloat(startPts[0].substr(1));
+		var startLongitude = parseFloat(startPts[1]);
+
+		var endLatitude = parseFloat(endPts[0].substr(1));
+		var endLongitude = parseFloat(endPts[1]);
+
+		x = endLatitude - startLatitude;
+		y = endLongitude - startLongitude;
+
+		var distance = Math.sqrt(x*x + y*y);
+
+		var centerLatitude = (startLatitude + endLatitude)/2;
+		var centerLongitude = (startLongitude + endLongitude)/2;
+
+		var radius = distance/2;
+
+		//console.log("start unit circle");
+		var cardinalNLongitude = (centerLongitude + radius);
+		//console.log(centerLatitude + "," +cardinalNLongitude);
+		var cardinalELatitude = (centerLatitude + radius);
+		//console.log(cardinalELatitude + "," + centerLongitude);
+		var cardinalSLongitude = (centerLongitude - radius);
+		//console.log(centerLatitude + "," +cardinalSLongitude);
+		var cardinalWLatitude = (centerLatitude - radius);
+		//console.log(cardinalWLatitude + "," + centerLongitude);
+		// console.log("end unit circle");
+
+		//console.log(actual_JSON[closest]);
+		//console.log(closest+ " key");
+
+
+		for(coordinate in actual_JSON[closest].locations){
+			// console.log(actual_JSON[closest].locations[coordinate] + " coord");
+			var splitCoords = actual_JSON[closest].locations[coordinate].split(",");
+			var coordLatitude = parseFloat(splitCoords[0].substr(1));
+			var coordLongitude = parseFloat(splitCoords[1]);
+			//console.log(coordLatitude + "," + coordLongitude);
+			if((coordLatitude < cardinalELatitude && coordLatitude > cardinalWLatitude) &&
+			coordLongitude < cardinalNLongitude && coordLongitude > cardinalSLongitude){
+				weight += 1;
+			}
+		}
+		return weight;
+	//}, calculateBestPath);
 }
+
 
 // to load JSON pothole & street data
 
@@ -86,20 +167,22 @@ function count(obj) {
 
 // get the number of potholes from the JSON
 function getNumPotholes() {
-	loadJSON(function(response) {
+	//loadJSON(function(response) {
 		// Parse JSON string into object
-		var actual_JSON = JSON.parse(response);
+		var actual_JSON = json;
 		var num = count(actual_JSON);
 		
 		console.log(num);
-	});
+	//});
 }
 
 // calculatePotHoles("E 102ND ST");
 
+//calculatePotHoles("E 102ND ST");
+
 function simscore (s1, s2) {
-	q1 = qgram(s1);
-	q2 = qgram(s2);
+	q1 = qgram(s1, 3);
+	q2 = qgram(s2, 3);
 	return jaccard(q1, q2)
 }
 
