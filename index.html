@@ -4,102 +4,26 @@
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
   <meta charset="utf-8">
   <title>Waypoints in directions</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="./scripts/script.js"></script>
   <script type="text/javascript" src="./scripts/pot.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script type="text/javascript" src="./scripts/animation.js"></script>
+
+
   <link rel="stylesheet" type="text/css" href="./styles/style.css">
   <style>
-  
-  body {
-    background-color: white;
-  }
-
   #floating-panel {
-    position: absolute;
-    top: 10px;
-    left: 25%;
-    z-index: 5;
-    background-color: #fff;
-    padding: 5px;
-    border: 1px solid #999;
-    text-align: center;
-    font-family: 'Roboto','sans-serif';
-    line-height: 30px;
-    padding-left: 10px;
-  }
-  .container {
-    padding-top: 10px;
-    display:table;
-    width: 100%;
-    height: 80px;
-    margin: 10px auto;
-    text-align: center;
-    vertical-align: middle;
-  }
-  #containerR {
-    text-align: center;
-    font-size: 25px; 
-  }
-  .containerB {
-    padding-top: 10px;
-    display:table;
-    width: 100%;
-    height: 80px;
-    margin: 8px auto;
-  }
-  .col {
-    display:inline-block;
-    width: 30%;
-    height: 100%;
-    background-color: #B0C4DE;
-    text-align: center;
-    color: white;
-    margin: 3px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  .col:hover, .col.color { background-color: #D3D3D3; }
-  /* Dropdown Button */
-  .dropbtn {
-      background-color: #B0C4DE;
-      color: white;
-      padding: 16px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-  }
-
-  .dropbtn:hover, .dropbtn:focus {
-      background-color: #D3D3D3;
-  }
-
-  .dropdown {
-      position: relative;
-      display: inline-block;
-      margin: 5px;
-  }
-
-  .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #f9f9f9;
-      min-width: 135px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-  }
-
-  .dropdown-content option {
-      color: black;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      list-style-type:none;
-  }
-
-  .dropdown-content option:hover {background-color: #f1f1f1}
-  .show {display:block;}
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
 
   </style>
 </head>
@@ -115,69 +39,34 @@
 <div id="map"></div>
 <div id="right-panel">
   <div>
-    
-  <div class="containerB">
-    
-    <div class="dropdown" id="start">
-      <button onclick= "dropDownS()" class="dropbtn">Starting Point</button>
-      <div id="myDropdownStart" class="dropdown-content">
-        <option class = "listS" value = "Hyde Park, Chicago, IL"> Hyde Park</option>
-        <option class = "listS" value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
-        <option class = "listS" value="chicago, il">Chicago</option>
-      </div>
-    </div>
-
-    <div class="dropdown" id="end">
-      <button onclick= "dropDownE()" class="dropbtn">Ending Point</button>
-      <div id="myDropdownEnd" class="dropdown-content">
-        <option class = "listE" value="Willis Tower, 233 S Wacker Dr, Chicago, IL 60606">Willis Tower</option>
-        <option class = "listE" value= "The university of Chicago">UChicago</option>
-        <option class = "listE" value="chicago, il">Chicago</option>
-      </div>
-    </div>
-  
-  </div>
-
-
-
-
-    <!-- <b>Start:</b>
+    <b>Start:</b>
     <select multiple id="start">
       <option value = "NBC Tower, 455 N Cityfront Plaza Dr, Chicago, IL 60611">NBC Tower</option>
       <option value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
       <option value="The Drake Hotel, 140 E Walton Pl, Chicago, IL 60611">Drake Hotel</option>
     </select>
-    <br> -->
-    <!-- <b>End:</b>
+    <br>
+    <b>Waypoints: to be added from data</b> <br>
+    <i>(Ctrl+Click or Cmd+Click for multiple selection)</i> <br>
+    <select multiple id="waypoints">
+      <option value="chicago, il">Chicago</option>
+      <option value="Madison, wi">Madison</option>
+      <option value="field museum">Art museum</option>
+      <option value = "Hyde Park, Chicago, IL">Hyde Park</option>
+      <option value= "The university of Chicago">UChicago</option>
+      <option value="Willis Tower, 233 S Wacker Dr, Chicago, IL 60606">Willis Tower</option>
+      <option value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
+
+    </select>
+    <br>
+    <b>End:</b>
     <select multiple id="end">
       <option value="Willis Tower, 233 S Wacker Dr, Chicago, IL 60606">Willis Tower</option>
-<<<<<<< HEAD
-      <option value= "The university of Chicago">UChicago</option>
-      <option value="chicago, il">Chicago</option>
-=======
       <option value= "Hilton Chicago, 720 S Michigan Ave, Chicago, IL 60605">South Hilton</option>
       <option value="Sound-Bar, 226 W Ontario St, Chicago, IL 60654">Sound-Bar</option>
 
->>>>>>> 7527c949f160b531532bd047946a30c18286ab80
     </select>
-    <br> -->
-
-
-  <br><br><br>
-  <div id = "containerR">Route Mod: </div>
-
-  <div class="container">
-      <div class="col" id="1">
-          Right Turns
-      </div>
-      <div class="col" id="2">
-          Potholes
-      </div>
-      <div class="col" id="3">
-          Normal
-      </div>
-  </div>
-  <br>
+    <br>
     <input type="submit" id="submit">
   </div>
   <div id="directions-panel"></div>
