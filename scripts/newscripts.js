@@ -12,7 +12,7 @@ function initMap() {
     directionsDisplay.setMap(map);
 
     document.getElementById('submit').addEventListener('click', function() {
-        rightRoute(directionsService, directionsDisplay);
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
     });
 }
 

@@ -266,14 +266,19 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 									destinations: [tempdest],
 									travelMode: 'DRIVING',
 								}, function(response, status){
+									var index = i;
 									// another compound callback function to pass the possible waypoint the scope of the 
 									// callback before overwritting
 									var tempDestination = tempdest;
 									// perform callback
-									callback(response, status, tempDestination);
+									callback(response, status, tempDestination, bestWaypoint, index);
+
 								});
 
-								function callback(response, status, destination) {
+								// console.log("MAYBE ASYNC DONE?")
+
+
+								function callback(response, status, destination, bestWaypoint, index) {
 									// distance
 									console.log(response['rows'][0]['elements'][0]['distance']);
 									// if the distance is smallest, push to master waypoints.
@@ -282,11 +287,16 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 										bestWaypoint = response['rows'][0]['elements'][0]['distance']['value'];
 										masterWaypoints.push(destination);    /// this is most likely wrong. 
 									}
+									// console.log("Index " + index)
+									// if(index === keep.length) {
+									// 	console.log("Honky bitches be tripping")
+									// }
 
 								}
 
 
 							}
+							// console.log("IS IT DONE YET?")
 
 						}
 					}
