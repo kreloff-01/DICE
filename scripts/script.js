@@ -35,6 +35,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     directionsService.route({
         origin: document.getElementById('start').value,
         destination: document.getElementById('end').value,
+        provideRouteAlternatives: true,
         waypoints: waypts,
         optimizeWaypoints: true,
         travelMode: 'DRIVING'
