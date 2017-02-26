@@ -3,10 +3,12 @@ var bearings = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"];    // cardinal dire
 
 var masterWaypoints = [];
 
+var directionsService;
+var directionsDisplay;
 
 function initMap() {
-	var directionsService = new google.maps.DirectionsService;
-	var directionsDisplay = new google.maps.DirectionsRenderer;
+	directionsService = new google.maps.DirectionsService;
+	directionsDisplay = new google.maps.DirectionsRenderer;
 	map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 6,
 		center: {lat: 41.85, lng: -87.65}
@@ -14,9 +16,9 @@ function initMap() {
 	directionsDisplay.setMap(map);
 
 	document.getElementById('submit').addEventListener('click', function() {
-		//rightRoute(directionsService, directionsDisplay);
+        //rightRoute(directionsService, directionsDisplay);
         calculateAndDisplayRoute(directionsService, directionsDisplay);
-	});
+    });
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -65,7 +67,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     });
 }
 
-function rightRoute(directionsService, directionsDisplay) {
+async function rightRoute(directionsService, directionsDisplay) {
 	// console.log("motherfucker")
 	var waypts = [];
 	directionsService.route({
@@ -121,17 +123,19 @@ function rightRoute(directionsService, directionsDisplay) {
 							// request for places by me
 							var request = {
 								location: pos,
-								radius: 100
+								radius: 300
 							};
 							// get nearby places. async so it kinda sucks
 							getNearBy(request, lat, lon, prevDirection);
+                            sleep(750);
 
 
 
-						} else {
+                        } else {
 							// push non-left positions to the master list
-							masterWaypoints.push(new google.maps.LatLng(lat, lon));
-						}
+                            console.log("A")
+                            masterWaypoints.push(new google.maps.LatLng(lat, lon));
+                        }
 						// save the prev direction for future direction changes
 						// helpful for determining lefts
 						prevDirection = getCardinalDirection(prevLat, prevLng, lat, lon);
@@ -183,11 +187,15 @@ function getCardinalDirection(lat1, lng1, lat2, lng2) {
 	return(bearings[index]);
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 
 // uses google places API in order to get nearby places of interest.
 // we can use these to set another waypoint to force right turns over left
-function getNearBy(request, latitude, longitude, prevDirect) {
+async function getNearBy(request, latitude, longitude, prevDirect) {
 	// instantiate service
 	var service = new google.maps.places.PlacesService(map);
 
@@ -200,11 +208,12 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 		var tempPrevDirection = prevDirect;
 		// make the actual callback function
 		callback(results, status, templat, templon, tempPrevDirection);
-	});
+        sleep(1000);
+    });
 
 
 
-	function callback(results, status, latt, lng, tempPrevDirection) {
+	async function callback(results, status, latt, lng, tempPrevDirection) {
 								// array of possible waypoints to keep
 								var keep = [];
 								if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -213,7 +222,7 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 									for (var l = 0; l < results.length; l++) {
 
 										// console.log(results[l])
-										console.log("... Calculating the direction to location ...")
+										console.log("... Calculating the direction to location ...");
 										var tempLat = results[l]['geometry']['location'].lat();
 										var tempLng = results[l]['geometry']['location'].lng();
 
@@ -264,7 +273,10 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 							// iterate through the keep and calculate distance
 
 
-							for(var i =0; i < keep.length; i++) {
+							for(var i = 0; i < keep.length; i++) {
+                                // if(i > 0) {
+                                //     await sleep(6000);
+                                // }
 								// temp lat/lon variable for calculation
 								var tempdest = new google.maps.LatLng(keep[i]['geometry']['location'].lat(), keep[i]['geometry']['location'].lng());
 								// request the distance matrix from google. async
@@ -278,12 +290,16 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 									// callback before overwritting
 									var tempDestination = tempdest;
 									// perform callback
-									callback(response, status, tempDestination);
-								});
+									callbackThree(response, status, tempDestination);
+                                    // await sleep(650)
+                                });
 
-								function callback(response, status, destination) {
+                                // await sleep(3000)
+                                function callbackThree(response, status, destination) {
+                                    // sleep(500);
 									// distance
-									console.log(response['rows'][0]['elements'][0]['distance']);
+                                    // console.log("AGH")
+									// console.log(response['rows'][0]['elements'][0]['distance']);
 									// if the distance is smallest, push to master waypoints.
 									// however there are issues here do to the async nature of the calls.
 									if( response['rows'][0]['elements'][0]['distance']['value'] < bestWaypoint || bestWaypoint === null) {
@@ -291,10 +307,62 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 										masterWaypoints.push(destination);    /// this is most likely wrong.
 									}
 
-								}
+                                    console.log(masterWaypoints);
 
 
-							}
+                                    var waypts = [];
 
-						}
-					}
+                                    for(var i = 1; i < masterWaypoints.length - 1; i++) {
+                                        waypts.push({
+                                            location: new google.maps.LatLng(masterWaypoints[i].lat(), masterWaypoints[i].lng()),
+                                            stopover: true
+                                        });
+                                    }
+
+                                    console.log(waypts)
+
+                                    directionsService.route({
+                                        origin: new google.maps.LatLng(masterWaypoints[0].lat(), masterWaypoints[0].lng()),
+                                        destination: new google.maps.LatLng(masterWaypoints[masterWaypoints.length-1].lat(), masterWaypoints[masterWaypoints.length-1].lng()),
+                                        provideRouteAlternatives: false,
+                                        waypoints: waypts,
+                                        optimizeWaypoints: false,
+                                        travelMode: 'DRIVING'
+                                    }, function(response, status) {
+                                        if (status === 'OK') {
+                                            console.log("OK ENTERED");
+                                            directionsDisplay.setDirections(response);
+                                            var weights = calculateBestPath(response);
+                                            var min = Math.min.apply(Math,weights);
+                                            var index = weights.indexOf(min);
+                                            console.log(index + " chosen route");
+                                            console.log(weights + " weights final");
+                                            var summaryPanel = document.getElementById('directions-panel');
+                                            summaryPanel.innerHTML = '';
+                                            var route = response.routes[index];
+            // For each route, display summary information.
+            for (var i = 0; i < route.legs.length; i++) {
+                var routeSegment = i + 1;
+                summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+                '</b><br>';
+                summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+            }
+        } else {
+            window.alert('Directions request failed due to ' + status);
+        }
+    });
+
+
+                                }
+                                // sleep(1200);
+
+
+                            }
+                            // await sleep(5000);
+                            // console.log("last?");
+
+                        }
+                        // console.log("last?");
+                    }
