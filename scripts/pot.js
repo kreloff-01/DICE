@@ -13,14 +13,23 @@ var json = (function () {
 	return json;
 })();
 
+function sleep(milliseconds) {
+	var start = new Date().getTime();
+	for (var i = 0; i < 1e7; i++) {
+		if ((new Date().getTime() - start) > milliseconds){
+			break;
+		}
+	}
+}
+
 function calculateBestPath(responses){
 	var numRoutes = responses.routes.length;
-	console.log(numRoutes + " num routes");
+	//console.log(numRoutes + " num routes");
 	// contains the total street weights
-	var routeWeights = [numRoutes];
+	var routeWeights = [0,0,0];
 	// for each route, send all of the streets in route i through the weight algorithm
 	// the final sum total of streets weights are put into the array
-	for(var i = 0; i < numRoutes; i++){
+	for(var i = 0; i < 3; i++){
 		var weight = 0;
 		for(var j = 0; j < responses.routes[i].legs.length; j++) {
 			var streets = [responses.routes[i].legs[j].steps.length];
@@ -28,14 +37,17 @@ function calculateBestPath(responses){
 				var name = parseStreetName(responses.routes[i].legs[j].steps[k].instructions);
 				streets[k] = new pathObj(name, responses.routes[i].legs[j].steps[k].start_location.toString(),
 					responses.routes[i].legs[j].steps[k].end_location.toString());
-				console.log(calculatePotHoleWeight(streets[k]) + " weight");
-				routeWeights[i] += calculatePotHoleWeight(streets[k]);
-				console.log(routeWeights[i] + " curr route weight");
+				//console.log(calculatePotHoleWeight(streets[k]) + " weight");
+				var temp = calculatePotHoleWeight(streets[k]);
+				//console.log(routeWeights)
+				//console.log("TEMP : " + temp)
+				routeWeights[i] += temp;
+				//console.log(routeWeights[i] + " curr route weight");
 			}
 		}
 		console.log(routeWeights[i] + " route weight");
 	}
-
+	return routeWeights;
 }
 
 // obj contains the streetname, start poing & end point for use in getting weight of pothoels
@@ -119,6 +131,9 @@ function calculatePotHoleWeight(street) {
 		var cardinalWLatitude = (centerLatitude - radius);
 		//console.log(cardinalWLatitude + "," + centerLongitude);
 		// console.log("end unit circle");
+
+		//console.log(actual_JSON[closest]);
+		//console.log(closest+ " key");
 
 
 		for(coordinate in actual_JSON[closest].locations){

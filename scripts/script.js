@@ -14,7 +14,8 @@ function initMap() {
 	directionsDisplay.setMap(map);
 
 	document.getElementById('submit').addEventListener('click', function() {
-		rightRoute(directionsService, directionsDisplay);
+		//rightRoute(directionsService, directionsDisplay);
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
 	});
 }
 
@@ -39,10 +40,13 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         travelMode: 'DRIVING'
     }, function(response, status) {
         if (status === 'OK') {
+            console.log("OK ENTERED");
             directionsDisplay.setDirections(response);
             var route = response.routes[0];
+            var weights = [];
             console.log(response);
-            calculateBestPath(response);
+            weights = calculateBestPath(response);
+            console.log(weights + " weights final");
             var summaryPanel = document.getElementById('directions-panel');
             summaryPanel.innerHTML = '';
             // For each route, display summary information.
