@@ -42,13 +42,14 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         if (status === 'OK') {
             console.log("OK ENTERED");
             directionsDisplay.setDirections(response);
-            var route = response.routes[0];
-            var weights = [];
-            console.log(response);
-            weights = calculateBestPath(response);
+            var weights = calculateBestPath(response);
+            var min = Math.min.apply(Math,weights);
+            var index = weights.indexOf(min);
+            console.log(index + " chosen route");
             console.log(weights + " weights final");
             var summaryPanel = document.getElementById('directions-panel');
             summaryPanel.innerHTML = '';
+            var route = response.routes[index];
             // For each route, display summary information.
             for (var i = 0; i < route.legs.length; i++) {
             	var routeSegment = i + 1;
