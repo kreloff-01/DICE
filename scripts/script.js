@@ -250,15 +250,13 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 									console.log(response['rows'][0]['elements'][0]['distance']);
 									if( response['rows'][0]['elements'][0]['distance']['value'] < bestWaypoint || bestWaypoint === null) {
 										bestWaypoint = response['rows'][0]['elements'][0]['distance']['value'];
-										// console.log(destination);
 										masterWaypoints.push(destination);
-										// console.log("^^^^^");
 									}
 
 								}
 
 
-}
+							}
 
-}
-}
+						}
+					}
