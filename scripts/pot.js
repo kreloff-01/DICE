@@ -161,7 +161,7 @@ function getNumPotholes() {
 	//});
 }
 
-getNumPotholes();
+// calculatePotHoles("E 102ND ST");
 
 //calculatePotHoles("E 102ND ST");
 
