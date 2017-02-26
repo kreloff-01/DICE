@@ -5,12 +5,16 @@ function initMap() {
     var directionsDisplay = new google.maps.DirectionsRenderer;
     var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 6,
-        center: {lat: 41.85, lng: -87.65}
+        center: {
+            lat: 41.85,
+            lng: -87.65
+        }
     });
     directionsDisplay.setMap(map);
 
     document.getElementById('submit').addEventListener('click', function() {
         calculateAndDisplayRoute(directionsService, directionsDisplay);
+        rightRoute(directionsService, directionsDisplay);
     });
 }
 
@@ -59,38 +63,38 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 
 
 function rightRoute(directionsService, directionsDisplay) {
-	var waypts = [];
-	directionsService.route({
-		origin: document.getElementById('start').value,
-		destination: document.getElementById('end').value,
-		waypoints: waypts,
-		optimizeWaypoints: true,
-		travelMode: 'DRIVING'
-	}, function(response, status) {
-		if(status === "OK") {
-			var routes = response['routes'];
-			// console.log(routes);
-			for(var i = 0 ; i < routes.length; i++) {
-				var route = routes[i];
-				var legs = route['legs'];
-				for(var j = 0; j < legs.length; j++) {
-					var leg = legs[j];
-					console.log(leg)
-					var steps = leg["steps"];
-					var prevLat, prevLng;
-					var prevDirection;
-					var lat, lon;
-					var skip = false;
+    var waypts = [];
+    directionsService.route({
+        origin: document.getElementById('start').value,
+        destination: document.getElementById('end').value,
+        waypoints: waypts,
+        optimizeWaypoints: true,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === "OK") {
+            var routes = response['routes'];
+            //console.log(routes);
+            for (var i = 0; i < routes.length; i++) {
+                var route = routes[i];
+                var legs = route['legs'];
+                for (var j = 0; j < legs.length; j++) {
+                    var leg = legs[j];
+                    //console.log(leg)
+                    var steps = leg["steps"];
+                    var prevLat, prevLng;
+                    var prevDirection;
+                    var lat, lon;
+                    var skip = false;
 
-					for(var y = 0; y < steps.length; y++){
+                    for (var y = 0; y < steps.length; y++) {
 
 
-						lat = steps[y]['start_point'].lat()
-						lon = steps[y]['start_point'].lng()
+                        lat = steps[y]['start_point'].lat()
+                        lon = steps[y]['start_point'].lng()
 
-						console.log(lat +", " + lon)
+                        //console.log(lat +", " + lon)
 
-						if(steps[y]['maneuver'] === "turn-left") {
+                        if (steps[y]['maneuver'] === "turn-left") {
 
 							// console.log("OH SHIT ITS A LEFT YO")
 							// console.log(steps[y])
@@ -102,130 +106,133 @@ function rightRoute(directionsService, directionsDisplay) {
 							var pos = new google.maps.LatLng(lat, lon);
 
 
-							var request = {
-								location: pos,
-								radius: 100
-							};
+
+                            var pos = new google.maps.LatLng(lat, lon);
+
+
+                            var request = {
+                                location: pos,
+                                radius: 100
+                            };
 
 
 
 
+                        }
 
-						}
+                        prevDirection = getCardinalDirection(prevLat, prevLng, lat, lon);
 
-						prevDirection = getCardinalDirection(prevLat, prevLng, lat, lon);
+                        //console.log("DIRECTION")
+                        //console.log(prevDirection)
 
-						console.log("DIRECTION")
-						console.log(prevDirection)
-
-						prevLat = lat;
-						prevLng = lon;
-
-
-						if(y === 0) {
-							var startLat = steps[y]['start_point'].lat();
-							var startLng = steps[y]['start_point'].lng();
-							prevLat = steps[y]['end_point'].lat();
-							prevLng = steps[y]['end_point'].lng();
-							prevDirection = getCardinalDirection(startLat, startLng, prevLat, prevLng);
-						}
+                        prevLat = lat;
+                        prevLng = lon;
 
 
-					// prevLat = steps[y]['start_point'].lat();
-					// prevLng = steps[y]['start_point'].lng();
+                        if (y === 0) {
+                            var startLat = steps[y]['start_point'].lat();
+                            var startLng = steps[y]['start_point'].lng();
+                            prevLat = steps[y]['end_point'].lat();
+                            prevLng = steps[y]['end_point'].lng();
+                            prevDirection = getCardinalDirection(startLat, startLng, prevLat, prevLng);
+                        }
 
-							// grabbing the steps one by one 
-							// they can be differentiated by their maneuver
-							// console.log(steps[y]["maneuver"]);
-							// console.log(steps[y]);
 
+                        // prevLat = steps[y]['start_point'].lat();
+                        // prevLng = steps[y]['start_point'].lng();
+
+                        // grabbing the steps one by one 
+                        // they can be differentiated by their maneuver
+                        // console.log(steps[y]["maneuver"]);
+                        // console.log(steps[y]);
 
 
 
-						}
-					}
-				}
-			}
 
-		// console.log(response);
-		// if (status === 'OK') {
-		// 	directionsDisplay.setDirections(response);
-		// 	var route = response.routes[0];
-		// 	var summaryPanel = document.getElementById('directions-panel');
-		// 	summaryPanel.innerHTML = '';
-  //           // For each route, display summary information.
-  //           for (var i = 0; i < route.legs.length; i++) {
-  //           	var routeSegment = i + 1;
-  //           	summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
-  //           	'</b><br>';
-  //           	summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
-  //           	summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
-  //           	summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
-  //           }
-  //       } else {
-  //       	window.alert('Directions request failed due to ' + status);
-  //       }
-});
+                    }
+                }
+            }
+        }
+
+        // console.log(response);
+        // if (status === 'OK') {
+        //  directionsDisplay.setDirections(response);
+        //  var route = response.routes[0];
+        //  var summaryPanel = document.getElementById('directions-panel');
+        //  summaryPanel.innerHTML = '';
+        //           // For each route, display summary information.
+        //           for (var i = 0; i < route.legs.length; i++) {
+        //            var routeSegment = i + 1;
+        //            summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+        //            '</b><br>';
+        //            summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+        //            summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+        //            summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+        //           }
+        //       } else {
+        //        window.alert('Directions request failed due to ' + status);
+        //       }
+    });
 }
 
 
 function getNearBy(request, latitude, longitude, prevLatt, prevLong) {
-	var service = new google.maps.places.PlacesService(map);
-	service.nearbySearch(request, function(results, status){ 
-		var templat = latitude;
-		var templon = longitude;
-		var prevLatTemp = prevLatt;
-		var prevLngTemp = prevLong;
-		callback(results, status, templat, templon, prevLatTemp, prevLngTemp) 
-	}); 
+    var service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, function(results, status) {
+        var templat = latitude;
+        var templon = longitude;
+        var prevLatTemp = prevLatt;
+        var prevLngTemp = prevLong;
+        callback(results, status, templat, templon, prevLatTemp, prevLngTemp)
+    });
 
-	// function calcWaypoint(param1, param2, param3, param4) {
-	// 	var templon = param2;
-							// 	var templat = param1;
-							// 	var tempPrevLon = param4;
-							// 	var tempPrevLat = param3;
-							// }
-
-
-							function callback(results, status, latt, lng, prevLatt, prevLong) {
-								if (status == google.maps.places.PlacesServiceStatus.OK) {
-									for (var l = 0; l < results.length; l++) {
-
-										// console.log(results[i])
-										console.log("... Calculating the direction to location ...")
-										prevDirection = getCardinalDirection(latt, lng, prevLatt, prevLong);
-
-										console.log("DIRECTION for left turn")
-										console.log(prevDirection)
-									// // createMarker(results[i]);
-								}
-							}
-						}
-					}
+    // function calcWaypoint(param1, param2, param3, param4) {
+    //  var templon = param2;
+    //  var templat = param1;
+    //  var tempPrevLon = param4;
+    //  var tempPrevLat = param3;
+    // }
 
 
+    function callback(results, status, latt, lng, prevLatt, prevLong) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+            for (var l = 0; l < results.length; l++) {
 
-					function getCardinalDirection(lat1, lng1, lat2, lng2) {
+                // console.log(results[i])
+                console.log("... Calculating the direction to location ...")
+                prevDirection = getCardinalDirection(latt, lng, prevLatt, prevLong);
 
-						var lon_distance = (lng2-lng1);
-
-						console.log("lat1 : " + lat1 + "\nlng1 : " + lng1 + "\nlat2 : " + lat2 + "\nlng2 : " + lng2)
-
-						var y = Math.sin(lon_distance) * Math.cos(lat2);
-						var x = Math.cos(lat1)*Math.sin(lat2) -
-						Math.sin(lat1)*Math.cos(lat2)*Math.cos(lon_distance);
-	var bearng_calc = Math.atan2(y, x) * (180/Math.PI);  // bearing
-
-	// console.log("BEARING CALCULATION : " + bearng_calc)
-
-	var bearings = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"];    // cardinal directions yo
-
-	var index = bearng_calc - 22.5;
+                console.log("DIRECTION for left turn")
+                console.log(prevDirection)
+                // // createMarker(results[i]);
+            }
+        }
+    }
+}
 
 
-	if (index < 0)
-		index += 360;
-	index = parseInt(index / 45);
+
+function getCardinalDirection(lat1, lng1, lat2, lng2) {
+
+    var lon_distance = (lng2 - lng1);
+
+    //console.log("lat1 : " + lat1 + "\nlng1 : " + lng1 + "\nlat2 : " + lat2 + "\nlng2 : " + lng2)
+
+    var y = Math.sin(lon_distance) * Math.cos(lat2);
+    var x = Math.cos(lat1) * Math.sin(lat2) -
+        Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon_distance);
+    var bearng_calc = Math.atan2(y, x) * (180 / Math.PI); // bearing
+
+    // console.log("BEARING CALCULATION : " + bearng_calc)
+
+    var bearings = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"]; // cardinal directions yo
+
+    var index = bearng_calc - 22.5;
+
+
+    if (index < 0)
+        index += 360;
+    index = parseInt(index / 45);
 
 	return(bearings[index]);
 }

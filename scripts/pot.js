@@ -41,6 +41,7 @@ function getPotholesFromStreetName(pathobj){
 	console.log(JSON);
 }
 
+// to load JSON pothole & street data
 function loadJSON(callback) {
 
 	var xobj = new XMLHttpRequest();
@@ -91,15 +92,10 @@ function getNumPotholes() {
 		var num = count(actual_JSON);
 		
 		console.log(num);
-
 	});
-
-	//for(int i = 0; i < Object.keys(actual_JSON).length; i++){
-	//console.log(Object.keys(actual_JSON).length);
-	//}
 }
 
-getNumPotholes();
+calculatePotHoles("E 102ND ST");
 
 function simscore (s1, s2) {
 	q1 = qgram(s1);
