@@ -1,13 +1,47 @@
 //var index = require('../data/street_ph.json')
 
+function calculateBestPath(responses){
+	var numRoutes = responses.routes.length;
+	// contains the total street weights
+	var routeWeights = [numRoutes];
+	// for each route, send all of the streets in route i through the weight algorithm
+	// the final sum total of streets weights are put into the array
+	for(var i = 0; i < numRoutes; i++){
+		var weight = 0;
+		for(var j = 0; j < responses.routes[i].legs.length; j++){
+			var streets = [responses.routes[i].legs[j].steps.length];
+			for(var k = 0; k < responses.routes[i].legs[j].steps.length; k++) {
+				var name = parseStreetName(responses.routes[i].legs[j].steps[k].instructions);
+				streets[i] = new pathObj(name, responses.routes[i].legs[j].steps[k].start_location.toString(),
+					responses.routes[i].legs[j].steps[k].end_location.toString());
+			}
+			routeWeights[i] = calculatePotHoleWeight(streets);
+		}
 
-function calculatePotHoles() {
-	
+	}
+}
 
+// obj contains the streetname, start poing & end point for use in getting weight of pothoels
+function pathObj(streetname, start_point, end_point){
+	this.name = streetname;
+	this.startLatLong = start_point;
+	this.endLatLong = end_point;
+}
+
+function parseStreetName(instructions){
+	var str = instructions;
+
+	var result = str.match(/<b>(.*?)<\/b>/g).map(function(val){
+		return val.replace(/<\/?b>/g,'');
+	});
+	return result[result.length-1];
+}
+
+function getPotholesFromStreetName(pathobj){
+	console.log(JSON);
 }
 
 // to load JSON pothole & street data
-
 function loadJSON(callback) {
 
 	var xobj = new XMLHttpRequest();
@@ -22,6 +56,22 @@ function loadJSON(callback) {
 	xobj.send(null);
 }
 
+
+function calculatePotHoleWeight(streets) {
+	loadJSON(function(response) {
+		// Parse JSON string into object
+		var actual_JSON = JSON.parse(response);
+		var countJSON = count(actual_JSON);
+	});
+	//for each street, calcuate the closest street name first
+	for(var i = 0; i < streets.length; i++){
+		var numPotholes
+	}
+
+	
+}
+
+// to load JSON pothole & street data
 
 function count(obj) {
 	var count=0;
@@ -38,19 +88,14 @@ function count(obj) {
 function getNumPotholes() {
 	loadJSON(function(response) {
 		// Parse JSON string into object
-		actual_JSON = JSON.parse(response);
-		console.log(actual_JSON);
+		var actual_JSON = JSON.parse(response);
 		var num = count(actual_JSON);
+		
 		console.log(num);
-
 	});
-
-	//for(int i = 0; i < Object.keys(actual_JSON).length; i++){
-	//console.log(Object.keys(actual_JSON).length);
-	//}
 }
 
-getNumPotholes();
+// calculatePotHoles("E 102ND ST");
 
 function simscore (s1, s2) {
 	q1 = qgram(s1);

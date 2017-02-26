@@ -56,18 +56,20 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
 }
 
 function rightRoute(directionsService, directionsDisplay) {
+	console.log("motherfucker")
 	var waypts = [];
 	directionsService.route({
-		origin: document.getElementById('start').value,
-		destination: document.getElementById('end').value,
-		waypoints: waypts,
-		optimizeWaypoints: true,
-		travelMode: 'DRIVING'
-	}, function(response, status) {
-		var takenRoute = [];
+        origin: document.getElementById('start').value,
+        destination: document.getElementById('end').value,
+        waypoints: waypts,
+        optimizeWaypoints: true,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+		// var takenRoute = [];
 		if(status === "OK") {
+			console.log(1 + "response")
 			var routes = response['routes'];
-			// console.log(routes);
+			console.log(routes);
 			for(var i = 0 ; i < routes.length; i++) {
 				var route = routes[i];
 				var legs = route['legs'];
@@ -82,7 +84,7 @@ function rightRoute(directionsService, directionsDisplay) {
 					var skip = false;
 
 					for(var y = 0; y < steps.length; y++){
-						// console.log("AGGGGGGGGG")
+						console.log("AGGGGGGGGG")
 						// console.log(steps[y])
 
 						lat = steps[y]['start_point'].lat()
@@ -224,8 +226,6 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 								}
 							}
 							console.log(keep);
-							// should do some distance shit here probably. 
-
-							
+							// should do some distance shit here probably.
 						}
 					}
