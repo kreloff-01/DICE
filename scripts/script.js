@@ -16,6 +16,7 @@ function initMap() {
         calculateAndDisplayRoute(directionsService, directionsDisplay);
         rightRoute(directionsService, directionsDisplay);
     });
+   // document.getElementById('mode').addEventListener('change',)
 }
 
 var routeResponse;
@@ -23,6 +24,7 @@ var routeResponse;
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     var waypts = [];
     var checkboxArray = document.getElementById('waypoints');
+    var travelMode = document.getElementById('mode').value;
     for (var i = 0; i < checkboxArray.length; i++) {
         if (checkboxArray.options[i].selected) {
             waypts.push({
@@ -37,7 +39,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         destination: document.getElementById('end').value,
         waypoints: waypts,
         optimizeWaypoints: true,
-        travelMode: 'DRIVING'
+        travelMode: google.maps.TravelMode[travelMode]
     }, function(response, status) {
         if (status === 'OK') {
             directionsDisplay.setDirections(response);

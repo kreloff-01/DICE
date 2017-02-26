@@ -8,33 +8,60 @@
   <script type="text/javascript" src="./scripts/pot.js"></script>
   <link rel="stylesheet" type="text/css" href="./styles/style.css">
   <style>
+  #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
 
   </style>
 </head>
 <body>
+   <div id="floating-panel">
+    <b>Mode of Travel: </b>
+    <select id="mode">
+      <option value="DRIVING">Driving</option>
+      <option value="WALKING">Walking</option>
+      <option value="BICYCLING">Bicycling</option>
+    </select>
+    </div>
 <div id="map"></div>
 <div id="right-panel">
   <div>
     <b>Start:</b>
-    <select id="start">
-      <option selected="selected" value="DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">SRC</option>
+    <select multiple id="start">
+      <option value = "Hyde Park, Chicago, IL">Hyde Park</option>
+      <option value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
+      <option value="chicago, il">Chicago</option>
     </select>
     <br>
     <b>Waypoints: to be added from data</b> <br>
     <i>(Ctrl+Click or Cmd+Click for multiple selection)</i> <br>
     <select multiple id="waypoints">
-      <option value="montreal, quebec">Montreal, QBC</option>
-      <option value="toronto, ont">Toronto, ONT</option>
       <option value="chicago, il">Chicago</option>
-      <option value="winnipeg, mb">Winnipeg</option>
-      <option value="fargo, nd">Fargo</option>
-      <option value="calgary, ab">Calgary</option>
-      <option value="spokane, wa">Spokane</option>
+      <option value="Madison, wi">Madison</option>
+      <option value="field museum">Art museum</option>
+      <option value = "Hyde Park, Chicago, IL">Hyde Park</option>
+      <option value= "The university of Chicago">UChicago</option>
+      <option value="Willis Tower, 233 S Wacker Dr, Chicago, IL 60606">Willis Tower</option>
+      <option value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
+
     </select>
     <br>
     <b>End:</b>
-    <select id="end">
-      <option selected="selected" value="Willis Tower, 233 S Wacker Dr, Chicago, IL 60606">DST</option>
+    <select multiple id="end">
+      <option value="Willis Tower, 233 S Wacker Dr, Chicago, IL 60606">Willis Tower</option>
+      <option value= "The university of Chicago">UChicago</option>
+      <option value="chicago, il">Chicago</option>
+
     </select>
     <br>
     <input type="submit" id="submit">
