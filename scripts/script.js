@@ -85,6 +85,8 @@ function rightRoute(directionsService, directionsDisplay) {
 					var lat, lon;
 					var skip = false;
 
+
+					// get the individual steps for the leg of the journey
 					for(var y = 0; y < steps.length; y++){
 						// console.log("AGGGGGGGGG")
 						// console.log(steps[y])
@@ -94,7 +96,7 @@ function rightRoute(directionsService, directionsDisplay) {
 
 						// console.log(lat + ", " + lon)
 
-
+						// if it is a left turn, do necessary changes to make it a right turn
 						if(steps[y]['maneuver'] === "turn-left") {
 
 							// console.log("OH SHIT ITS A LEFT YO")
@@ -105,23 +107,25 @@ function rightRoute(directionsService, directionsDisplay) {
 							// console.log(lat + ", " + lon)
 							
 							
-
+							// make a google lat,long object with lat/long of left turn intersection
 							var pos = new google.maps.LatLng(lat, lon);
 
-
+							// request for places by me
 							var request = {
 								location: pos,
 								radius: 100
 							};
-
+							// get nearby places. async so it kinda sucks
 							getNearBy(request, lat, lon, prevDirection);
 
 
 
 						} else {
+							// push non-left positions to the master list
 							masterWaypoints.push(new google.maps.LatLng(lat, lon));
 						}
-
+						// save the prev direction for future direction changes
+						// helpful for determining lefts
 						prevDirection = getCardinalDirection(prevLat, prevLng, lat, lon);
 
 						prevLat = lat;
@@ -147,6 +151,8 @@ function rightRoute(directionsService, directionsDisplay) {
 	});
 }
 
+
+// function used to get the cardinal direction giving two lat/lon points
 function getCardinalDirection(lat1, lng1, lat2, lng2) {
 
 	var lon_distance = (lng2-lng1);
@@ -170,26 +176,32 @@ function getCardinalDirection(lat1, lng1, lat2, lng2) {
 } 
 
 
-function getNearBy(request, latitude, longitude, prevDirect) {
-	// console.log("MADE IT HERE YO")
-	var service = new google.maps.places.PlacesService(map);
-	// console.log(1)
-	// console.log("lat1 : " + latitude + "\nlng1 : " + longitude + "\nlat2 : " + prevLatt + "\nlng2 : " + prevLong)
-	service.nearbySearch(request, function(results, status){
 
+// uses google places API in order to get nearby places of interest. 
+// we can use these to set another waypoint to force right turns over left
+function getNearBy(request, latitude, longitude, prevDirect) {
+	// instantiate service
+	var service = new google.maps.places.PlacesService(map);
+
+	// make the search. it is async which is why we have a compound callback function
+	// we need it to pass 
+	service.nearbySearch(request, function(results, status){
+		// save variables to the scope of the callback func
 		var templat = latitude;
 		var templon = longitude;
 		var tempPrevDirection = prevDirect;
+		// make the actual callback function
 		callback(results, status, templat, templon, tempPrevDirection);
 	}); 
 
 
 
 	function callback(results, status, latt, lng, tempPrevDirection) {
-								// console.log(3)
-								// console.log("kklat1 : " + latitude + "\nlng1 : " + longitude + "\nlat2 : " + prevLatt + "\nlng2 : " + prevLong)
+								// array of possible waypoints to keep 
 								var keep = [];
 								if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+									// iterate through the results testing if they require a left turn 
 									for (var l = 0; l < results.length; l++) {
 
 										// console.log(results[l])
@@ -201,6 +213,9 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 
 										
 
+
+
+										/* the following section determines if you are taking a left or right turn based on the change in cardinal directions */
 										var indexOfPrevDirect = bearings.indexOf(tempPrevDirection);
 										var indexOfTempDirect;
 										if(indexOfPrevDirect > 4) {
@@ -215,9 +230,12 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 										} else {
 											indexOfTempDirect = bearings.indexOf(tempDirection);
 										}
+										/* end of section */ 
 
-										console.log(indexOfPrevDirect + " ::: " + indexOfTempDirect)
 
+										// console.log(indexOfPrevDirect + " ::: " + indexOfTempDirect)
+
+										// if it is not a left turn, add it to the list of possible waypoints
 										if(indexOfTempDirect - indexOfPrevDirect <= 3 && indexOfTempDirect - indexOfPrevDirect >= 0) {
 											// console.log("should be a right turn");
 											// console.log("DIRECTION for left turn\nPrevDirection --> directionOfHotspot")
@@ -229,28 +247,40 @@ function getNearBy(request, latitude, longitude, prevDirect) {
 									// // createMarker(results[i]);
 								}
 							}
+
+							// get a lat/lon position for current pos
 							var pos = new google.maps.LatLng(latt, lng);
 							var bestWaypoint = null;
+							// initialize service
 							var service = new google.maps.DistanceMatrixService();
+							// iterate through the keep and calculate distance
+
 
 							for(var i =0; i < keep.length; i++) {
+								// temp lat/lon variable for calculation
 								var tempdest = new google.maps.LatLng(keep[i]['geometry']['location'].lat(), keep[i]['geometry']['location'].lng());
-
+								// request the distance matrix from google. async
 								service.getDistanceMatrix(
 								{
 									origins: [pos],
 									destinations: [tempdest],
 									travelMode: 'DRIVING',
 								}, function(response, status){
+									// another compound callback function to pass the possible waypoint the scope of the 
+									// callback before overwritting
 									var tempDestination = tempdest;
+									// perform callback
 									callback(response, status, tempDestination);
 								});
 
 								function callback(response, status, destination) {
+									// distance
 									console.log(response['rows'][0]['elements'][0]['distance']);
+									// if the distance is smallest, push to master waypoints.
+									// however there are issues here do to the async nature of the calls. 
 									if( response['rows'][0]['elements'][0]['distance']['value'] < bestWaypoint || bestWaypoint === null) {
 										bestWaypoint = response['rows'][0]['elements'][0]['distance']['value'];
-										masterWaypoints.push(destination);
+										masterWaypoints.push(destination);    /// this is most likely wrong. 
 									}
 
 								}
