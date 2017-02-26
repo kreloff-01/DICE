@@ -30,6 +30,10 @@ OTHER SOURCES OF DOCUMENTATION
     See also:
         - http://data.cityofchicago.org/
         - https://developers.google.com/maps/
+        
+Contributing:
+
+email your interest to kreloff@wisc.edu
 
 License
 
