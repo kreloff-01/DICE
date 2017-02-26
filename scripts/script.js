@@ -16,8 +16,15 @@ function initMap() {
 	directionsDisplay.setMap(map);
 
 	document.getElementById('submit').addEventListener('click', function() {
-        //rightRoute(directionsService, directionsDisplay);
-        calculateAndDisplayRoute(directionsService, directionsDisplay);
+		var choose = document.getElementById('choice').value;
+		if (choose === "potholes") {
+			calculateAndDisplayRoute(directionsService, directionsDisplay);
+		} else if (choose === 'elevation') {
+			chooseHill(directionsService, directionsDisplay);
+		} else if (choose === 'right_turn') {
+			rightRoute(directionsService, directionsDisplay);
+		}
+
     });
 }
 

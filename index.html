@@ -7,6 +7,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script type="text/javascript" src="./scripts/script.js"></script>
   <script type="text/javascript" src="./scripts/pot.js"></script>
+    <script type="text/javascript" src="./scripts/hill.js"></script>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -60,6 +61,7 @@
       <option value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
 
     </select>
+
     <br>
     <b>End:</b>
     <select multiple id="end">
@@ -68,15 +70,19 @@
       <option value="Sound-Bar, 226 W Ontario St, Chicago, IL 60654">Sound-Bar</option>
 
     </select>
-    <b>Route Manipulation:</b>
-    <select id="choice">
-      <option value = "NBC Tower, 455 N Cityfront Plaza Dr, Chicago, IL 60611">NBC Tower</option>
-      <option value = "DoubleTree by Hilton Hotel Chicago - Magnificent Mile, 300 E Ohio St, Chicago, IL 60611">Hilton Hotel</option>
-      <option value="The Drake Hotel, 140 E Walton Pl, Chicago, IL 60611">Drake Hotel</option>
-    </select>
-    <br>
+      <div>
+          <br>
+          <b>Route Modification: </b>
+          <select id="choice">
+              <option value ="potholes"> Pothole Avoidance</option>
+              <option value ="right_turn"> Right hand turns only </option>
+              <option value ="elevation"> Elevation Training </option>
+          </select>
+      </div>
+      <br>
     <input type="submit" id="submit">
   </div>
+
   <div id="directions-panel"></div>
 </div>
 <script>
