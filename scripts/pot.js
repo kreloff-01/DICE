@@ -24,6 +24,7 @@ function sleep(milliseconds) {
 
 function calculateBestPath(responses){
 	var numRoutes = responses.routes.length;
+
 	//console.log(numRoutes + " num routes");
 	// contains the total street weights
 	var routeWeights = [0,0,0];
