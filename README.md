@@ -5,13 +5,11 @@ data from data.cityofchicago.org,in ways that improve the lives
 of everyday citizens' health and safety. These tools are meant
 to assist people heading outside, whether it be biking or driving.
 
-    Features
-        - Google API now has the ability to select the route
-        with the least potholes in it
-        - Select the optimal biking route for exercise
-        (highest cumulative elevation gain)
-        - Select the easiest biking route for relaxed biking
-        (lowest cumulative elevation gain)
+FEATURES
+
+    1. Google API now has the ability to select the route with the least potholes in it
+    2. Select the optimal biking route for exercise (highest cumulative elevation gain)
+    3. Select a route with the minimized number of right turns to conserve fuel
 
 USAGE
 
